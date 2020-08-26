@@ -2,8 +2,10 @@
 #Each row is a unique game and features have been collected after the first 10 minutes of
 #the game. Column gameId can be used to collect more attributes from Riot API, 
 #column blueWins is the target.
-
+install.packages("ggcorrplot")
 library(tidyverse)
+library(ggcorrplot)
+
 games <- read_csv("high_diamond_ranked_10min.csv")
 
 #A.--------------------------Understand dataset and varibles--------------------------------
@@ -58,20 +60,38 @@ games <- games %>%
 # Convert data types
 games <- games %>% 
   mutate(blueWins = factor(blueWins,
-                           levels = c(0,1),
-                           labels = c("BlueLost", "BlueWon")),
+                           levels = c(0,1)),
          blueFirstBlood = factor(blueFirstBlood, 
-                                 levels = c(0,1),
-                                 labels = c("Not Blue 1st-Kill", "Blue 1st-Kill")),
+                                 levels = c(0,1)),
          redFirstBlood = factor(redFirstBlood, 
-                                 levels = c(0,1),
-                                 labels = c("Not Red 1st-Kill", "Red 1st-Kill")))
+                                 levels = c(0,1)))
 
 #check for NA values
 sum(is.na(games)) 
 str(games)
 
-#C.-------------------------Univariate Analysis: Analyze varibles one by one--------------------------
+
+
+#C.---------------------------Univariate Analysis: Analyze varibles one by one--------------------------
+
+#distributions of all continuous varibles
+games %>% 
+  keep(is.numeric) %>%                     
+  gather() %>%                             # Convert to key-value pairs
+  ggplot(aes(value)) +                     # Plot the values
+  facet_wrap(~ key, scales = "free") +     # In separate panels
+  geom_density()                           # as density
+
+
+games %>% 
+  keep(is.factor) %>%                     
+  gather() %>%                             # Convert to key-value pairs
+  ggplot(aes(value)) +                     # Plot the values
+  facet_wrap(~ key, scales = "free") +     # In separate panels
+  geom_bar()+                              # as bar plots
+  geom_text(stat = "count",aes(label=..count..), vjust=-0.25)
+
+
 
 
 #D.---------------------Bivariate Analysis: Explore relationship between varibles----------------------
@@ -80,6 +100,16 @@ str(games)
 
 
 #***Correlation matrix analysis
+corr <- games %>% 
+  select(-c(blueFirstBlood,redFirstBlood,blueWins)) %>% 
+  cor() %>% 
+  round(1)
+
+# plot heatmap of correlation
+ggcorrplot(corr, 
+           hc.order = TRUE,          # Using hierarchical clustering
+           type = "lower",           # Keep the lower triangle 
+           outline.col = "white")    # Outliner color white
 
 
 
