@@ -1,11 +1,19 @@
 "# League-Of-Legend" 
 
+
 1. EDA
-1.a Understand dataset and varibles
+  A. Understand dataset and varibles: Descriptions of each varible
 
-1.b Univariate Data Analysis
+  B. Data Preparation: Convert data types, Remove unnecessary varibles, and Check for NAs.
+  
+  C. Univariate Analysis: Analyze varibles one by one
 
-1.c Multivariate Data Analysis
+  D. Bivariate Analysis: Explore relationship between varibles
 
-
+  E. Outliners: Detecting and Treating outliners
+  
+  F. Feature Engineering:
+  
+  
+  => Finally produce a new dataset called "clean_LOL_data.csv"
 2. 

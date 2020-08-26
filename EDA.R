@@ -4,11 +4,11 @@
 #column blueWins is the target.
 
 library(tidyverse)
+
 games <- read_csv("high_diamond_ranked_10min.csv")
+#1. Understand varibles:
+#blueWins:           1 if the blue team has won, 0 otherwise.
 
-#A.--------------------------Understand dataset and varibles--------------------------------
-
-#blueWins:           1 if the blue team has won, 0 otherwise. (target)
 #blueWardsPlaced:    Number of warding totems placed by the blue team on the map
 #blueWardsDestroyed: Number of enemy warding totems the blue team has destroyed
 #blueFirstBlood:     First kill of the game. 1 if the blue team did the first kill, 0 otherwise
@@ -48,14 +48,6 @@ games <- read_csv("high_diamond_ranked_10min.csv")
 #redCSPerMin:        Red team CS (minions) per minute
 #redGoldPerMin:      Red team gold per minute
 
-
-#B.-----------------------------------------Data Preparation--------------------------------------
-# Drop repeated columns
-games <- games %>% 
-  select(-c(gameId,redGoldDiff,redExperienceDiff))
-
-
-# Convert data types
 games <- games %>% 
   mutate(blueWins = factor(blueWins,
                            levels = c(0,1),
@@ -63,60 +55,36 @@ games <- games %>%
          blueFirstBlood = factor(blueFirstBlood, 
                                  levels = c(0,1),
                                  labels = c("Not Blue 1st-Kill", "Blue 1st-Kill")),
-         redFirstBlood = factor(redFirstBlood, 
+         redFirstBlood = factor(blueFirstBlood, 
                                  levels = c(0,1),
                                  labels = c("Not Red 1st-Kill", "Red 1st-Kill")))
 
-#check for NA values
-sum(is.na(games)) 
-str(games)
+sum(is.na(games)) #check na values
 
-#C.-------------------------Univariate Analysis: Analyze varibles one by one--------------------------
-
-
-#D.---------------------Bivariate Analysis: Explore relationship between varibles----------------------
-#***Pair Grids to check relationships between parameters of blue teams
-
-
-
-#***Correlation matrix analysis
-
-
-
-#*** Dive deeper in some relationships
-
-# How amount of gold and kills determine the result
-games %>% 
+#2. Some visualisations to understand the dataset better:
+games %>% #how amount of gold and kills determine the result
   ggplot(mapping = aes(x=blueTotalGold, y=blueKills))+ 
     geom_point(aes(col=blueWins, alpha=1/10))+
     ggtitle("how amount of gold and kills at minute 10 determine the result")
     #questions: 
 
-
-# How first kill affect the end result
-games %>% 
+games %>% #how first kill affect the end result
   ggplot(mapping = aes(x=blueFirstBlood))+ 
     geom_bar(aes(fill=blueWins))+ 
     ggtitle("how first kill before first 10 mins affect the end result")
 
-
-# How blueDeaths affect the end result
-games %>% 
+games %>% #how blueDeaths affect the end result
   ggplot(mapping = aes(x=blueDeaths))+ 
     geom_bar(aes(fill=blueWins))+ 
     ggtitle("how blueDeaths before first 10 mins affect the end result")
   #=> the more deaths, the likelier of losing.
 
-
-# Blue Deaths and Red Deaths
 games %>%
   count(blueDeaths,redDeaths) %>% 
   ggplot(mapping = aes(x=blueDeaths, y=redDeaths))+ 
   geom_tile(aes(fill=n))+
   ggtitle("Red deaths, Blue Deaths") 
-  #suggest a pattern?
-
-
+    
 games %>%
   count(blueAssists,redDeaths) %>% 
   ggplot(mapping = aes(x=blueAssists, y=redDeaths))+ 
